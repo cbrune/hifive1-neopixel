@@ -15,7 +15,7 @@ long.
 Checkout this movie of the project in action:
 
 [![Neopixel
-Movie](https://github.com/cbrune/hifive1-neopixel/raw/docs/images/neopixel2.png)](https://drive.google.com/file/d/1mkJ5xrstvN9mLhz_lywdatLuAuN919Km6w/view?usp=sharing)
+Movie](https://github.com/cbrune/hifive1-neopixel/raw/docs/images/neopixel2.png)](https://www.youtube.com/watch?v=rKaM95WB7-A)
 
 All in all, totally fun project.  Enjoy!
 
