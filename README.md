@@ -46,9 +46,9 @@ I followed [this
 guide](https://learn.adafruit.com/adafruit-neopixel-uberguide/basic-connections)
 to connect the LED strip to a power supply.
 
-Connect the positive lead of the LED PIN-8 on the HiFive1 and the
-negative lead to a ground.  This is defined in the code `neopixel.c`
-and the constant `NEO_GPIO`.
+Connect the positive lead of the LED strip to PIN-8 on the HiFive1 and
+the negative lead to a ground.  This is defined in the code
+`neopixel.c` and the constant `NEO_GPIO`.
 
 # Compile the code
 
