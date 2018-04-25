@@ -11,5 +11,4 @@ CFLAGS += -O2 -fno-builtin-printf -DNO_INIT $(WARN_ERROR_FLAGS)
 $(C_OBJS) : WARN_ERROR_FLAGS = -Wall -Werror
 $(C_OBJS) : CFLAGS += -std=c99
 
-BSP_BASE = $(SDKDIR)/bsp
 include $(BSP_BASE)/env/common.mk
