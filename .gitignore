@@ -2,3 +2,6 @@
 /cscope.out.in
 /cscope.out.po
 /openocd_upload.log
+neopixel/*.o
+neopixel/*.a
+neopixel/neopixel

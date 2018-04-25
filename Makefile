@@ -17,6 +17,46 @@ wrkdir := $(srcdir)/work
 
 DEFAULT_BOARD := freedom-e300-hifive1
 DEFAULT_PROGRAM := neopixel
+BOARD ?= $(DEFAULT_BOARD)
+PROGRAM ?= $(DEFAULT_PROGRAM)
+LINK_TARGET ?= flash
+
+#############################################################
+# BSP Loading
+#############################################################
+
+# Finds the directory in which this BSP is located, ensuring that there is
+# exactly one.
+board_dir := $(wildcard $(SDKDIR)/bsp/env/$(BOARD))
+ifeq ($(words $(board_dir)),0)
+$(error Unable to find BSP for $(BOARD), expected to find either "bsp/$(BOARD)" or "bsp-addons/$(BOARD)")
+endif
+ifneq ($(words $(board_dir)),1)
+$(error Found multiple BSPs for $(BOARD): "$(board_dir)")
+endif
+
+# There must be a settings makefile fragment in the BSP's board directory.
+ifeq ($(wildcard $(board_dir)/settings.mk),)
+$(error Unable to find BSP for $(BOARD), expected to find $(board_dir)/settings.mk)
+endif
+include $(board_dir)/settings.mk
+
+ifeq ($(RISCV_ARCH),)
+$(error $(board_dir)/board.mk must set RISCV_ARCH, the RISC-V ISA string to target)
+endif
+
+ifeq ($(RISCV_ABI),)
+$(error $(board_dir)/board.mk must set RISCV_ABI, the ABI to target)
+endif
+
+# Determines the XLEN from the toolchain tuple
+ifeq ($(patsubst rv32%,rv32,$(RISCV_ARCH)),rv32)
+RISCV_XLEN := 32
+else ifeq ($(patsubst rv64%,rv64,$(RISCV_ARCH)),rv64)
+RISCV_XLEN := 64
+else
+$(error Unable to determine XLEN from $(RISCV_ARCH))
+endif
 
 #############################################################
 # Prints help message
@@ -58,16 +98,17 @@ all:
 # This section is for tool installation
 #############################################################
 
-toolchain_srcdir := $(SDKDIR)/riscv-gnu-toolchain
-toolchain32_wrkdir := $(SDKDIR)/work/riscv32-gnu-toolchain
-toolchain_dest := $(SDKDIR)/toolchain
-PATH := $(toolchain_dest)/bin:$(PATH)
+CROSS_PREFIX  ?= riscv64-unknown-elf
+RISCV_PATH    ?= $(SDKDIR)/work/build/riscv-gnu-toolchain/$(CROSS_PREFIX)/prefix
+RISCV_GCC     := $(abspath $(RISCV_PATH)/bin/$(CROSS_PREFIX)-gcc)
+RISCV_GXX     := $(abspath $(RISCV_PATH)/bin/$(CROSS_PREFIX)-g++)
+RISCV_OBJDUMP := $(abspath $(RISCV_PATH)/bin/$(CROSS_PREFIX)-objdump)
+RISCV_GDB     := $(abspath $(RISCV_PATH)/bin/$(CROSS_PREFIX)-gdb)
+RISCV_AR      := $(abspath $(RISCV_PATH)/bin/$(CROSS_PREFIX)-ar)
 
 #############################################################
 # This Section is for Software Compilation
 #############################################################
-BOARD ?= $(DEFAULT_BOARD)
-PROGRAM ?= $(DEFAULT_PROGRAM)
 PROGRAM_DIR = $(srcdir)/$(PROGRAM)
 PROGRAM_ELF = $(PROGRAM_DIR)/$(PROGRAM)
 
@@ -77,7 +118,7 @@ software_clean:
 
 .PHONY: software
 software: software_clean
-	$(Q) $(MAKE) -C $(PROGRAM_DIR)
+	$(Q) $(MAKE) -C $(PROGRAM_DIR) CC=$(RISCV_GCC) RISCV_ARCH=$(RISCV_ARCH) RISCV_ABI=$(RISCV_ABI) AR=$(RISCV_AR) BOARD=$(BOARD) LINK_TARGET=$(LINK_TARGET)
 
 dasm: software	
 	$(Q) $(toolchain_dest)/bin/riscv32-unknown-elf-objdump -D $(PROGRAM_ELF)

@@ -14,7 +14,7 @@
 
 static unsigned long mtime_lo(void)
 {
-  return *(volatile unsigned long *)(CLINT_BASE_ADDR + CLINT_MTIME);
+  return *(volatile unsigned long *)(CLINT_CTRL_ADDR + CLINT_MTIME);
 }
 
 static void use_hfrosc(int div, int trim)

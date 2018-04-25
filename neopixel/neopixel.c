@@ -22,7 +22,7 @@
 #define NEO_GPIO (PIN_8_OFFSET)
 #define NEO_GPIO_MASK (1 << NEO_GPIO)
 static inline volatile uint64_t get_timer() {
-    return *((volatile uint64_t*)(CLINT_BASE_ADDR + CLINT_MTIME));
+    return *((volatile uint64_t*)(CLINT_CTRL_ADDR + CLINT_MTIME));
 }
 
 /**
